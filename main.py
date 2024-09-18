@@ -9,9 +9,18 @@ from shot import *
 
 def main():
     pygame.init()
+    score = 0
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     
+    ### New feature work: Scoreboard
+    pygame.display.set_caption("Asteroids")
+    scoreboardfont = pygame.font.Font('freesansbold.ttf', 24)
+    scoreboard = scoreboardfont.render(f"Score: {score}", True, 'green', "black")
+    scoreboardrect = scoreboard.get_rect()
+    scoreboardrect.center = (SCREEN_WIDTH - SCREEN_WIDTH * .15 , SCREEN_HEIGHT - SCREEN_HEIGHT * .95) 
+    
+    ###
     dt = 0
    
     updatable = pygame.sprite.Group()
@@ -37,16 +46,23 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.check_collision(player):
-                print("GAME OVER!")
+                print(f"GAME OVER! Final Score: {score}")
                 sys.exit()
             for shot in shots:
                 if asteroid.check_collision(shot):
                     shot.kill()
                     asteroid.split()
-
+                    if asteroid.radius == ASTEROID_MAX_RADIUS:
+                        score += ASTEROID_MIN_POINTS
+                    elif asteroid.radius == ASTEROID_MIN_RADIUS * 2:
+                        score += ASTEROID_MID_POINTS
+                    else:
+                        score += ASTEROID_MAX_POINTS
 
         #creates pygame Surface object with background color "black"
         screen.fill((0,0,0))
+        scoreboard = scoreboardfont.render(f"Score: {score}", True, 'green', "black")
+        screen.blit(scoreboard, scoreboardrect)
 
         for inst in drawable:
             inst.draw(screen)
